@@ -29,7 +29,13 @@ module Chessington
       include Piece
 
       def available_moves(board)
-        []
+        current_square = board.find_piece(self)
+        if self.player == Player::WHITE
+          current_square.row = current_square.row + 1
+        else
+          current_square.row = current_square.row - 1
+        end
+        [current_square]
       end
     end
 
