@@ -21,6 +21,16 @@ module Chessington
         current_square = board.find_piece(self)
         board.move_piece(current_square, new_square)
       end
+
+      # checks if the piece is obstructed # TODO: add the push to list here too?
+      def obstructed_move?(board, move_square)
+        if board.get_piece(move_square).nil?
+          false
+        else
+          true
+        end
+      end
+
     end
 
     ##
@@ -30,12 +40,32 @@ module Chessington
 
       def available_moves(board)
         current_square = board.find_piece(self)
+        available_moves = []
         if self.player == Player::WHITE
-          current_square.row = current_square.row + 1
+          if current_square.row == 1
+            # maybe outsource all this junk into a new method
+            new_position = Square.at(current_square.row + 2, current_square.column)
+            unless obstructed_move?(board, new_position)
+              available_moves.push(new_position)
+            end
+          end
+          new_position = Square.at(current_square.row + 1, current_square.column)
+          unless obstructed_move?(board, new_position)
+            available_moves.push(new_position)
+          end
         else
-          current_square.row = current_square.row - 1
+          if current_square.row == 6
+            new_position = Square.at(current_square.row - 2, current_square.column)
+            unless obstructed_move?(board, new_position)
+              available_moves.push(new_position)
+            end
+          end
+          new_position = Square.at(current_square.row - 1, current_square.column)
+          unless obstructed_move?(board, new_position)
+            available_moves.push(new_position)
+          end
         end
-        [current_square]
+        available_moves
       end
     end
 
