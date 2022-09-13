@@ -136,8 +136,42 @@ module Chessington
     class Bishop
       include Piece
 
+      def find_all_diagonal_moves_in_one_direction(current_square, row_modifier, column_modifier)
+        current = current_square
+        possible_moves = []
+        while valid_move_square?(current)
+          current = Square.at(current.row + row_modifier, current.column + column_modifier)
+          if valid_move_square?(current)
+            possible_moves.push(current)
+          end
+        end
+        possible_moves
+      end
+
+      def find_possible_diagonal_moves(current_square)
+        possible_moves_lists = []
+        # Up + right moves
+        possible_moves_lists.push(find_all_diagonal_moves_in_one_direction(current_square, 1, 1))
+        # Down + right moves
+        possible_moves_lists.push(find_all_diagonal_moves_in_one_direction(current_square, -1, 1))
+        # Up + left moves
+        possible_moves_lists.push(find_all_diagonal_moves_in_one_direction(current_square, 1, -1))
+        # Down + left moves
+        possible_moves_lists.push(find_all_diagonal_moves_in_one_direction(current_square, -1, -1))
+        possible_moves_lists
+      end
+
       def available_moves(board)
-        []
+        current_square = board.find_piece(self)
+        available_moves = []
+        diagonal_moves_lists = find_possible_diagonal_moves(current_square)
+        for move_list in diagonal_moves_lists
+          for i in 0...move_list.length
+            add_unobstructed_move(board, available_moves, move_list[i], move_list[0..i])
+          end
+          add_capture_moves(board, available_moves, move_list, self.player)
+        end
+        available_moves
       end
     end
 
