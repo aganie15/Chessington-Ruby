@@ -241,7 +241,18 @@ module Chessington
       include Piece
 
       def available_moves(board)
-        []
+        current_square = board.find_piece(self)
+        available_moves = []
+        straight_line_moves = find_possible_straight_moves(current_square)
+        diagonal_line_moves = find_possible_diagonal_moves(current_square)
+        all_move_lists = straight_line_moves + diagonal_line_moves
+        for move_list in all_move_lists
+          for i in 0...move_list.length
+            add_unobstructed_move(board, available_moves, move_list[i], move_list[0..i])
+          end
+          add_capture_moves(board, available_moves, move_list, self.player)
+        end
+        available_moves
       end
     end
 

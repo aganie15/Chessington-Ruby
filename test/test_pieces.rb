@@ -804,6 +804,102 @@ class TestPieces < Minitest::Test
   class TestQueen < Minitest::Test
     include Chessington::Engine
 
+    def test_queen_can_move_in_diagonal_and_straight_lines
+      # Arrange
+      board = Board.empty
+      queen = Queen.new(Player::BLACK)
+      queen_square = Square.at(5, 1)
+      board.set_piece(queen_square, queen)
+
+      # Act
+      moves = queen.available_moves(board)
+
+      # Assert
+      # Diagonal lines
+      # Down + left
+      assert_includes(moves, Square.at(4, 0))
+      # Up + left
+      assert_includes(moves, Square.at(6, 0))
+      # Down + right
+      assert_includes(moves, Square.at(4, 2))
+      assert_includes(moves, Square.at(3, 3))
+      assert_includes(moves, Square.at(2, 4))
+      assert_includes(moves, Square.at(1, 5))
+      assert_includes(moves, Square.at(0, 6))
+      # Up + right
+      assert_includes(moves, Square.at(6, 2))
+      assert_includes(moves, Square.at(7, 3))
+
+      # Straight Lines
+      # Right
+      assert_includes(moves, Square.at(5, 2))
+      assert_includes(moves, Square.at(5, 3))
+      assert_includes(moves, Square.at(5, 4))
+      assert_includes(moves, Square.at(5, 5))
+      assert_includes(moves, Square.at(5, 6))
+      assert_includes(moves, Square.at(5, 7))
+      # Down
+      assert_includes(moves, Square.at(4, 1))
+      assert_includes(moves, Square.at(3, 1))
+      assert_includes(moves, Square.at(2, 1))
+      assert_includes(moves, Square.at(1, 1))
+      assert_includes(moves, Square.at(0, 1))
+      # Left
+      assert_includes(moves, Square.at(5, 0))
+      # Up
+      assert_includes(moves, Square.at(6, 1))
+      assert_includes(moves, Square.at(7, 1))
+
+    end
+
+    def test_queen_can_capture_in_diagonal_and_straight_lines
+      # Arrange
+      board = Board.empty
+      queen = Queen.new(Player::WHITE)
+      queen_square = Square.at(4, 6)
+      board.set_piece(queen_square, queen)
+
+      enemy = Pawn.new(Player::BLACK)
+      enemy_square = Square.at(6, 4)
+      board.set_piece(enemy_square, enemy)
+
+      # Act
+      moves = queen.available_moves(board)
+
+      # Assert
+      assert_includes(moves, enemy_square)
+    end
+
+    def test_queen_cannot_move_if_obstructed
+      # Arrange
+      board = Board.empty
+      queen = Queen.new(Player::BLACK)
+      queen_square = Square.at(5, 1)
+      board.set_piece(queen_square, queen)
+
+      friendly = Pawn.new(Player::BLACK)
+      friendly_square = Square.at(5, 4)
+      board.set_piece(friendly_square, friendly)
+
+      # Act
+      moves = queen.available_moves(board)
+
+      # Assert
+      refute_includes(moves, friendly_square)
+      refute_includes(moves, Square.at(5, 5))
+      refute_includes(moves, Square.at(5, 6))
+      refute_includes(moves, Square.at(5, 7))
+
+    end
+
+  end
+
+  class TestKing < Minitest::Test
+    include Chessington::Engine
+
+
+
+    end
 
   end
 
