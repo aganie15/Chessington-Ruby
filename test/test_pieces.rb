@@ -345,5 +345,201 @@ class TestPieces < Minitest::Test
       refute_includes(moves, Square.at(2, 3))
       refute_includes(moves, Square.at(2, 5))
     end
+    def test_white_pawns_cannot_capture_king
+
+      # Arrange
+      board = Board.empty
+      pawn = Pawn.new(Player::WHITE)
+      pawn_square = Square.at(3, 4)
+      board.set_piece(pawn_square, pawn)
+
+      enemy_king = King.new(Player::BLACK)
+      enemy_king_square = Square.at(4, 5)
+      board.set_piece(enemy_king_square, enemy_king)
+
+      # Act
+      moves = pawn.available_moves(board)
+
+      # Assert
+      refute_includes(moves, Square.at(4, 5))
+    end
+
+    def test_black_pawns_cannot_capture_king
+
+      # Arrange
+      board = Board.empty
+      pawn = Pawn.new(Player::BLACK)
+      pawn_square = Square.at(3, 4)
+      board.set_piece(pawn_square, pawn)
+
+      enemy_king = King.new(Player::BLACK)
+      enemy_king_square = Square.at(2, 5)
+      board.set_piece(enemy_king_square, enemy_king)
+
+      # Act
+      moves = pawn.available_moves(board)
+
+      # Assert
+      refute_includes(moves, Square.at(2, 5))
+    end
   end
+
+  class TestKnight < Minitest::Test
+    include Chessington::Engine
+    def test_white_knights_can_move_in_L_shape
+
+      # Arrange
+      board = Board.empty
+      knight = Knight.new(Player::WHITE)
+      knight_square = Square.at(4, 4)
+      board.set_piece(knight_square, knight)
+
+      # Act
+      moves = knight.available_moves(board)
+
+      # Assert
+      # Up and right
+      assert_includes(moves, Square.at(5, 6))
+      assert_includes(moves, Square.at(6, 5))
+      # Down and right
+      assert_includes(moves, Square.at(3, 6))
+      assert_includes(moves, Square.at(2, 5))
+      # Down and left
+      assert_includes(moves, Square.at(2, 3))
+      assert_includes(moves, Square.at(3, 2))
+      # Up and left
+      assert_includes(moves, Square.at(5, 2))
+      assert_includes(moves, Square.at(6, 3))
+
+    end
+
+    def test_black_knights_can_move_in_L_shape
+
+      # Arrange
+      board = Board.empty
+      knight = Knight.new(Player::BLACK)
+      knight_square = Square.at(4, 4)
+      board.set_piece(knight_square, knight)
+
+      # Act
+      moves = knight.available_moves(board)
+
+      # Assert
+      # Up and right
+      assert_includes(moves, Square.at(5, 6))
+      assert_includes(moves, Square.at(6, 5))
+      # Down and right
+      assert_includes(moves, Square.at(3, 6))
+      assert_includes(moves, Square.at(2, 5))
+      # Down and left
+      assert_includes(moves, Square.at(2, 3))
+      assert_includes(moves, Square.at(3, 2))
+      # Up and left
+      assert_includes(moves, Square.at(5, 2))
+      assert_includes(moves, Square.at(6, 3))
+
+    end
+
+    def test_white_knight_can_only_move_if_unobstructed
+
+      # Arrange
+      board = Board.empty
+      knight = Knight.new(Player::WHITE)
+      knight_square = Square.at(4, 4)
+      board.set_piece(knight_square, knight)
+
+      friendly = Pawn.new(Player::WHITE)
+      friendly_square = Square.at(2, 3)
+      board.set_piece(friendly_square, friendly)
+
+      # Act
+      moves = knight.available_moves(board)
+
+      # Assert
+      refute_includes(moves, friendly_square)
+
+    end
+
+    def test_black_knight_can_only_move_if_unobstructed
+
+      # Arrange
+      board = Board.empty
+      knight = Knight.new(Player::WHITE)
+      knight_square = Square.at(4, 4)
+      board.set_piece(knight_square, knight)
+
+      friendly = Pawn.new(Player::WHITE)
+      friendly_square = Square.at(3, 6)
+      board.set_piece(friendly_square, friendly)
+
+      # Act
+      moves = knight.available_moves(board)
+
+      # Assert
+      refute_includes(moves, friendly_square)
+
+    end
+
+    def test_white_knight_can_capture_enemies
+
+      # Arrange
+      board = Board.empty
+      knight = Knight.new(Player::WHITE)
+      knight_square = Square.at(4, 4)
+      board.set_piece(knight_square, knight)
+
+      enemy = Pawn.new(Player::BLACK)
+      enemy_square = Square.at(3, 6)
+      board.set_piece(enemy_square, enemy)
+
+      # Act
+      moves = knight.available_moves(board)
+
+      # Assert
+      assert_includes(moves, enemy_square)
+
+    end
+
+    def test_black_knight_can_capture_enemies
+
+      # Arrange
+      board = Board.empty
+      knight = Knight.new(Player::BLACK)
+      knight_square = Square.at(4, 4)
+      board.set_piece(knight_square, knight)
+
+      enemy = Pawn.new(Player::WHITE)
+      enemy_square = Square.at(5, 2)
+      board.set_piece(enemy_square, enemy)
+
+      # Act
+      moves = knight.available_moves(board)
+
+      # Assert
+      assert_includes(moves, enemy_square)
+
+    end
+
+    def test_knight_cannot_jump_off_board
+
+      # Arrange
+      board = Board.empty
+      knight = Knight.new(Player::WHITE)
+      knight_square = Square.at(7, 7)
+      board.set_piece(knight_square, knight)
+
+      # Act
+      moves = knight.available_moves(board)
+
+      # Assert
+      refute_includes(moves, Square.at(8, 9))
+      refute_includes(moves, Square.at(9, 8))
+      refute_includes(moves, Square.at(6, 9))
+      refute_includes(moves, Square.at(9, 6))
+
+    end
+
+  end
+
+
 end

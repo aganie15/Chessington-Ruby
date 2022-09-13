@@ -32,20 +32,28 @@ module Chessington
             no_obstruction = false
           end
         }
-        if board.get_piece(move_square).nil? && no_obstruction
-          available_moves.push(move_square)
+        if valid_move_square?(move_square)
+          if board.get_piece(move_square).nil? && no_obstruction
+            available_moves.push(move_square)
+          end
         end
-        available_moves
+      end
+
+      def valid_move_square?(move_square)
+        ((move_square.row <= 7) && (move_square.row >= 0) && (move_square.column <= 7) && (move_square.column >= 0))
       end
 
       # capture squares is a list containing the possible capture squares
       def add_capture_moves(board, available_moves, capture_squares, current_player)
         capture_squares.each { |capture_square|
-          # check if there is a piece here
-          unless board.get_piece(capture_square).nil?
-            capture_piece = board.get_piece(capture_square)
-            if capture_piece.player != current_player
-              available_moves.push(capture_square)
+          # check if the move is valid
+          if valid_move_square?(capture_square)
+            # check if there is a piece at capture square
+            unless board.get_piece(capture_square).nil?
+              capture_piece = board.get_piece(capture_square)
+              if capture_piece.player != current_player && !capture_piece.is_a?(King)
+                available_moves.push(capture_square)
+              end
             end
           end
         }
@@ -99,7 +107,27 @@ module Chessington
       include Piece
 
       def available_moves(board)
-        []
+        current_square = board.find_piece(self)
+        available_moves = []
+        new_position_list = [
+          # Up and right
+          Square.at(current_square.row + 2, current_square.column + 1),
+          Square.at(current_square.row + 1, current_square.column + 2),
+          # Down and right
+          Square.at(current_square.row - 1, current_square.column + 2),
+          Square.at(current_square.row - 2, current_square.column + 1),
+          # Down and left
+          Square.at(current_square.row - 2, current_square.column - 1),
+          Square.at(current_square.row - 1, current_square.column - 2),
+          # Up and left
+          Square.at(current_square.row + 1, current_square.column - 2),
+          Square.at(current_square.row + 2, current_square.column - 1)
+        ]
+        new_position_list.each { |new_position|
+          add_unobstructed_move(board, available_moves, new_position)
+        }
+        add_capture_moves(board, available_moves, new_position_list, self.player)
+        available_moves
       end
     end
 
