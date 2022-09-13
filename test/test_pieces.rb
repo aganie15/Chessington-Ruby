@@ -558,20 +558,20 @@ class TestPieces < Minitest::Test
 
       # Assert
       # Down + left
-      assert_includes(moves, Square.at(1,2))
-      assert_includes(moves, Square.at(0,1))
+      assert_includes(moves, Square.at(1, 2))
+      assert_includes(moves, Square.at(0, 1))
       # Up + left
-      assert_includes(moves, Square.at(3,2))
-      assert_includes(moves, Square.at(4,1))
-      assert_includes(moves, Square.at(5,0))
+      assert_includes(moves, Square.at(3, 2))
+      assert_includes(moves, Square.at(4, 1))
+      assert_includes(moves, Square.at(5, 0))
       # Down + right
-      assert_includes(moves, Square.at(1,4))
-      assert_includes(moves, Square.at(0,5))
+      assert_includes(moves, Square.at(1, 4))
+      assert_includes(moves, Square.at(0, 5))
       # Up + right
-      assert_includes(moves, Square.at(3,4))
-      assert_includes(moves, Square.at(4,5))
-      assert_includes(moves, Square.at(5,6))
-      assert_includes(moves, Square.at(6,7))
+      assert_includes(moves, Square.at(3, 4))
+      assert_includes(moves, Square.at(4, 5))
+      assert_includes(moves, Square.at(5, 6))
+      assert_includes(moves, Square.at(6, 7))
 
     end
 
@@ -588,20 +588,20 @@ class TestPieces < Minitest::Test
 
       # Assert
       # Down + left
-      assert_includes(moves, Square.at(1,2))
-      assert_includes(moves, Square.at(0,1))
+      assert_includes(moves, Square.at(1, 2))
+      assert_includes(moves, Square.at(0, 1))
       # Up + left
-      assert_includes(moves, Square.at(3,2))
-      assert_includes(moves, Square.at(4,1))
-      assert_includes(moves, Square.at(5,0))
+      assert_includes(moves, Square.at(3, 2))
+      assert_includes(moves, Square.at(4, 1))
+      assert_includes(moves, Square.at(5, 0))
       # Down + right
-      assert_includes(moves, Square.at(1,4))
-      assert_includes(moves, Square.at(0,5))
+      assert_includes(moves, Square.at(1, 4))
+      assert_includes(moves, Square.at(0, 5))
       # Up + right
-      assert_includes(moves, Square.at(3,4))
-      assert_includes(moves, Square.at(4,5))
-      assert_includes(moves, Square.at(5,6))
-      assert_includes(moves, Square.at(6,7))
+      assert_includes(moves, Square.at(3, 4))
+      assert_includes(moves, Square.at(4, 5))
+      assert_includes(moves, Square.at(5, 6))
+      assert_includes(moves, Square.at(6, 7))
 
     end
 
@@ -613,7 +613,7 @@ class TestPieces < Minitest::Test
       board.set_piece(bishop_square, bishop)
 
       friendly = Pawn.new(Player::WHITE)
-      friendly_square = Square.at(3,4)
+      friendly_square = Square.at(3, 4)
       board.set_piece(friendly_square, friendly)
 
       # Act
@@ -621,10 +621,9 @@ class TestPieces < Minitest::Test
 
       # Assert
       refute_includes(moves, friendly_square)
-      # intermediate squares
-      refute_includes(moves, Square.at(4,5))
-      refute_includes(moves, Square.at(5,6))
-      refute_includes(moves, Square.at(6,7))
+      refute_includes(moves, Square.at(4, 5))
+      refute_includes(moves, Square.at(5, 6))
+      refute_includes(moves, Square.at(6, 7))
 
     end
 
@@ -635,8 +634,8 @@ class TestPieces < Minitest::Test
       bishop_square = Square.at(2, 3)
       board.set_piece(bishop_square, bishop)
 
-      friendly = Pawn.new(Player::WHITE)
-      friendly_square = Square.at(1,2)
+      friendly = Pawn.new(Player::BLACK)
+      friendly_square = Square.at(1, 2)
       board.set_piece(friendly_square, friendly)
 
       # Act
@@ -644,8 +643,7 @@ class TestPieces < Minitest::Test
 
       # Assert
       refute_includes(moves, friendly_square)
-      # intermediate squares
-      refute_includes(moves, Square.at(0,1))
+      refute_includes(moves, Square.at(0, 1))
 
     end
 
@@ -660,14 +658,14 @@ class TestPieces < Minitest::Test
       moves = bishop.available_moves(board)
 
       # Assert
-      refute_includes(moves, Square.at(8,8))
-      refute_includes(moves, Square.at(6,8))
-      refute_includes(moves, Square.at(8,6))
-      refute_includes(moves, Square.at(-1,-1))
+      refute_includes(moves, Square.at(8, 8))
+      refute_includes(moves, Square.at(6, 8))
+      refute_includes(moves, Square.at(8, 6))
+      refute_includes(moves, Square.at(-1, -1))
 
     end
 
-    def test_white_bishop_can_capture_pieces_in_its_path
+    def test_white_bishop_can_capture_in_diagonal_lines
       # Arrange
       board = Board.empty
       bishop = Bishop.new(Player::WHITE)
@@ -686,7 +684,7 @@ class TestPieces < Minitest::Test
 
     end
 
-    def test_black_bishop_can_capture_pieces_in_its_path
+    def test_black_bishop_can_capture_in_diagonal_lines
       # Arrange
       board = Board.empty
       bishop = Bishop.new(Player::BLACK)
@@ -704,6 +702,108 @@ class TestPieces < Minitest::Test
       assert_includes(moves, enemy_square)
 
     end
+  end
+
+  class TestRook < Minitest::Test
+    include Chessington::Engine
+
+    def test_rook_can_move_in_straight_lines
+      # Arrange
+      board = Board.empty
+      rook = Rook.new(Player::BLACK)
+      rook_square = Square.at(4, 3)
+      board.set_piece(rook_square, rook)
+
+      # Act
+      moves = rook.available_moves(board)
+
+      # Assert
+      # Right
+      assert_includes(moves, Square.at(4, 4))
+      assert_includes(moves, Square.at(4, 5))
+      assert_includes(moves, Square.at(4, 6))
+      assert_includes(moves, Square.at(4, 7))
+      # Down
+      assert_includes(moves, Square.at(3, 3))
+      assert_includes(moves, Square.at(2, 3))
+      assert_includes(moves, Square.at(1, 3))
+      assert_includes(moves, Square.at(0, 3))
+      # Left
+      assert_includes(moves, Square.at(4, 2))
+      assert_includes(moves, Square.at(4, 1))
+      assert_includes(moves, Square.at(4, 0))
+      # Up
+      assert_includes(moves, Square.at(4, 5))
+      assert_includes(moves, Square.at(4, 6))
+      assert_includes(moves, Square.at(4, 7))
+
+    end
+
+    def test_white_rook_can_capture_in_straight_lines
+      # Arrange
+      board = Board.empty
+      rook = Rook.new(Player::WHITE)
+      rook_square = Square.at(4, 3)
+      board.set_piece(rook_square, rook)
+
+      enemy = Pawn.new(Player::BLACK)
+      enemy_square = Square.at(4, 1)
+      board.set_piece(enemy_square, enemy)
+
+      # Act
+      moves = rook.available_moves(board)
+
+      # Assert
+      assert_includes(moves, enemy_square)
+
+    end
+
+    def test_black_rook_can_capture_in_straight_lines
+      # Arrange
+      board = Board.empty
+      rook = Rook.new(Player::BLACK)
+      rook_square = Square.at(4, 3)
+      board.set_piece(rook_square, rook)
+
+      enemy = Pawn.new(Player::WHITE)
+      enemy_square = Square.at(1, 3)
+      board.set_piece(enemy_square, enemy)
+
+      # Act
+      moves = rook.available_moves(board)
+
+      # Assert
+      assert_includes(moves, enemy_square)
+
+    end
+
+    def test_rook_cannot_move_if_obstructed
+      # Arrange
+      board = Board.empty
+      rook = Rook.new(Player::WHITE)
+      rook_square = Square.at(4, 3)
+      board.set_piece(rook_square, rook)
+
+      friendly = Pawn.new(Player::WHITE)
+      friendly_square = Square.at(3, 3)
+      board.set_piece(friendly_square, friendly)
+
+      # Act
+      moves = rook.available_moves(board)
+
+      # Assert
+      refute_includes(moves, friendly_square)
+      refute_includes(moves, Square.at(2, 3))
+      refute_includes(moves, Square.at(1, 3))
+      refute_includes(moves, Square.at(0, 3))
+
+    end
+
+  end
+
+  class TestQueen < Minitest::Test
+    include Chessington::Engine
+
 
   end
 
