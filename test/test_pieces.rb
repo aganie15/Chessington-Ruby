@@ -383,6 +383,124 @@ class TestPieces < Minitest::Test
       # Assert
       refute_includes(moves, Square.at(2, 5))
     end
+
+    def test_white_pawns_can_capture_en_passant
+
+      # Arrange
+      board = Board.empty
+      pawn = Pawn.new(Player::WHITE)
+      pawn_square = Square.at(4, 5)
+      board.set_piece(pawn_square, pawn)
+
+      enemy_pawn = Pawn.new(Player::BLACK)
+      enemy_pawn_square = Square.at(4, 4)
+      board.set_piece(enemy_pawn_square, enemy_pawn)
+
+      # Act
+      moves = pawn.available_moves(board)
+
+      # Assert
+      assert_includes(moves, Square.at(5, 4))
+    end
+
+    def test_black_pawns_can_capture_en_passant
+
+      # Arrange
+      board = Board.empty
+      pawn = Pawn.new(Player::BLACK)
+      pawn_square = Square.at(3, 7)
+      board.set_piece(pawn_square, pawn)
+
+      enemy_pawn = Pawn.new(Player::WHITE)
+      enemy_pawn_square = Square.at(3, 6)
+      board.set_piece(enemy_pawn_square, enemy_pawn)
+
+      # Act
+      moves = pawn.available_moves(board)
+
+      # Assert
+      assert_includes(moves, Square.at(2, 6))
+    end
+
+    # EN PASSANT REQUIREMENTS
+    # - The captured pawn must have moved two squares in one move,
+    # landing right next to the capturing pawn.
+    # - The en passant capture must be performed on the turn immediately
+    # after the pawn being captured moves. If the player does not capture
+    # en passant on that turn, they no longer can do it later.
+    def test_white_pawn_can_only_capture_en_passant_when_requirements_above_are_fulfilled
+      # Arrange
+      board = Board.empty
+
+      enemy_pawn = Pawn.new(Player::BLACK)
+      enemy_pawn_square = Square.at(6, 4)
+      board.set_piece(enemy_pawn_square, enemy_pawn)
+
+      pawn = Pawn.new(Player::WHITE)
+      pawn_square = Square.at(4, 5)
+      board.set_piece(pawn_square, pawn)
+
+      # Black pawn moves two squares in one move
+      board.current_player = Player::BLACK
+      board.move_piece(enemy_pawn_square, Square.at(4, 4))
+
+      # Act
+      moves_before = pawn.available_moves(board)
+
+      friendly_pawn = Pawn.new(Player::WHITE)
+      friendly_pawn_square = Square.at(3, 1)
+      board.set_piece(friendly_pawn_square, friendly_pawn)
+      board.move_piece(friendly_pawn_square, Square.at(4, 1))
+
+      unrelated_enemy_pawn = Pawn.new(Player::BLACK)
+      unrelated_enemy_pawn_square = Square.at(6, 0)
+      board.set_piece(unrelated_enemy_pawn_square, unrelated_enemy_pawn)
+      board.move_piece(unrelated_enemy_pawn_square, Square.at(5, 0))
+
+      moves_after = pawn.available_moves(board)
+
+      # Assert
+      assert_includes(moves_before, Square.at(5, 4))
+      refute_includes(moves_after, Square.at(5, 4))
+
+    end
+
+    def test_black_pawn_can_only_capture_en_passant_when_requirements_above_are_fulfilled
+      # Arrange
+      board = Board.empty
+
+      enemy_pawn = Pawn.new(Player::WHITE)
+      enemy_pawn_square = Square.at(1, 6)
+      board.set_piece(enemy_pawn_square, enemy_pawn)
+
+      pawn = Pawn.new(Player::BLACK) #b
+      pawn_square = Square.at(3, 7)
+      board.set_piece(pawn_square, pawn)
+
+      # Black pawn moves two squares in one move
+      board.current_player = Player::WHITE
+      board.move_piece(enemy_pawn_square, Square.at(3, 6))
+
+      # Act
+      moves_before = pawn.available_moves(board)
+
+      friendly_pawn = Pawn.new(Player::BLACK) # b
+      friendly_pawn_square = Square.at(6, 0)
+      board.set_piece(friendly_pawn_square, friendly_pawn)
+      board.move_piece(friendly_pawn_square, Square.at(5, 0))
+
+      unrelated_enemy_pawn = Pawn.new(Player::WHITE)
+      unrelated_enemy_pawn_square = Square.at(6, 7)
+      board.set_piece(unrelated_enemy_pawn_square, unrelated_enemy_pawn)
+      board.move_piece(unrelated_enemy_pawn_square, Square.at(7, 7))
+
+      moves_after = pawn.available_moves(board)
+
+      # Assert
+      assert_includes(moves_before, Square.at(2, 6))
+      refute_includes(moves_after, Square.at(2, 6))
+
+    end
   end
 
   class TestKnight < Minitest::Test
@@ -965,7 +1083,7 @@ class TestPieces < Minitest::Test
       board.set_piece(king_square, king)
 
       enemy = Pawn.new(Player::WHITE)
-      enemy_square = Square.at(4,4)
+      enemy_square = Square.at(4, 4)
       board.set_piece(enemy_square, enemy)
 
       # Act
@@ -984,7 +1102,7 @@ class TestPieces < Minitest::Test
       board.set_piece(king_square, king)
 
       friendly = Pawn.new(Player::BLACK)
-      friendly_square = Square.at(4,4)
+      friendly_square = Square.at(4, 4)
       board.set_piece(friendly_square, friendly)
 
       # Act
@@ -992,9 +1110,9 @@ class TestPieces < Minitest::Test
 
       # Assert
       refute_includes(moves, friendly_square)
-      refute_includes(moves, Square.at(5,4))
-      refute_includes(moves, Square.at(6,4))
-      refute_includes(moves, Square.at(7,4))
+      refute_includes(moves, Square.at(5, 4))
+      refute_includes(moves, Square.at(6, 4))
+      refute_includes(moves, Square.at(7, 4))
 
     end
 

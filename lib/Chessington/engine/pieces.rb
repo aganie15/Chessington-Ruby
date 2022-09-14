@@ -131,36 +131,76 @@ module Chessington
     class Pawn
       include Piece
 
+      def pawn_just_moved_two_places(board, captured_piece)
+        current_position = board.find_piece(captured_piece)
+        if captured_piece.player == Player::WHITE
+          board.previous_board_state[current_position.row - 2][current_position.column] == captured_piece
+        else
+          board.previous_board_state[current_position.row + 2][current_position.column] == captured_piece
+        end
+      end
+
+      def add_en_passant_capture_moves(board, available_moves, capture_squares, current_player)
+        capture_squares.each { |capture_square|
+          # check if the move is valid
+          if valid_move_square?(capture_square)
+            # check if there is a pawn just below the capture square
+            if current_player == Player::WHITE
+              captured_pawn_square = Square.at(capture_square.row - 1, capture_square.column)
+            else
+              # check if there is a pawn just above capture square
+              captured_pawn_square = Square.at(capture_square.row + 1, capture_square.column)
+            end
+            unless board.get_piece(captured_pawn_square).nil?
+              capture_piece = board.get_piece(captured_pawn_square)
+              # must check the piece is a PAWN and it moved 2 PLACES in one GO immediately before our move!
+              if capture_piece.player != current_player && capture_piece.is_a?(Pawn)
+                if pawn_just_moved_two_places(board, capture_piece)
+                  available_moves.push(capture_square)
+                end
+              end
+            end
+          end
+        }
+      end
+
       def available_moves(board)
         current_square = board.find_piece(self)
         available_moves = []
         if self.player == Player::WHITE
-          if current_square.row == 1
+          if current_square.row == 1 # White pawn at starting position
             new_position = Square.at(current_square.row + 2, current_square.column)
             # must check we are not jumping over any pieces
             middle_tile = Square.at(current_square.row + 1, current_square.column)
             add_unobstructed_move(board, available_moves, new_position, [middle_tile])
+          elsif current_square.row == 4 # White pawn has moved exactly 3 ranks - Possible en passant?
+            en_passant_capture_squares = [Square.at(current_square.row + 1, current_square.column - 1),
+                                          Square.at(current_square.row + 1, current_square.column + 1)]
+            add_en_passant_capture_moves(board, available_moves, en_passant_capture_squares, self.player)
           end
-          if current_square.row != 7
-            new_position = Square.at(current_square.row + 1, current_square.column)
-            add_unobstructed_move(board, available_moves, new_position)
-            # check for possible captures
-            capture_squares = [Square.at(current_square.row + 1, current_square.column + 1), Square.at(current_square.row + 1, current_square.column - 1)]
-            add_capture_moves(board, available_moves, capture_squares, self.player)
-          end
+
+          new_position = Square.at(current_square.row + 1, current_square.column)
+          add_unobstructed_move(board, available_moves, new_position)
+          # check for possible captures
+          capture_squares = [Square.at(current_square.row + 1, current_square.column + 1),
+                             Square.at(current_square.row + 1, current_square.column - 1)]
+          add_capture_moves(board, available_moves, capture_squares, self.player)
         else
-          if current_square.row == 6
+          if current_square.row == 6 # Black pawn at starting position
             new_position = Square.at(current_square.row - 2, current_square.column)
             middle_tile = Square.at(current_square.row - 1, current_square.column)
             add_unobstructed_move(board, available_moves, new_position, [middle_tile])
+          elsif current_square.row == 3 # Black pawn has moved exactly 3 ranks - Possible en passant?
+            en_passant_capture_squares = [Square.at(current_square.row - 1, current_square.column - 1),
+                                          Square.at(current_square.row - 1, current_square.column + 1)]
+            add_en_passant_capture_moves(board, available_moves, en_passant_capture_squares, self.player)
           end
-          if current_square.row != 0
-            new_position = Square.at(current_square.row - 1, current_square.column)
-            add_unobstructed_move(board, available_moves, new_position)
-            # check for possible captures
-            capture_squares = [Square.at(current_square.row - 1, current_square.column + 1), Square.at(current_square.row - 1, current_square.column - 1)]
-            add_capture_moves(board, available_moves, capture_squares, self.player)
-          end
+          new_position = Square.at(current_square.row - 1, current_square.column)
+          add_unobstructed_move(board, available_moves, new_position)
+          # check for possible captures
+          capture_squares = [Square.at(current_square.row - 1, current_square.column + 1),
+                             Square.at(current_square.row - 1, current_square.column - 1)]
+          add_capture_moves(board, available_moves, capture_squares, self.player)
         end
         available_moves
       end

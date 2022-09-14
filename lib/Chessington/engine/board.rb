@@ -10,12 +10,13 @@ module Chessington
     ##
     #  A representation of the chess board, and the pieces on it.
     class Board
-      attr_accessor :current_player, :board
+      attr_accessor :current_player, :board, :previous_board_state
 
       BOARD_SIZE = 8
       def initialize(player, board_state)
         @current_player = Player::WHITE
         @board = board_state
+        @previous_board_state = board_state
       end
 
       def self.empty
@@ -73,6 +74,7 @@ module Chessington
       def move_piece(from_square, to_square)
         moving_piece = get_piece(from_square)
         if !moving_piece.nil? && moving_piece.player == @current_player
+          @previous_board_state = @board.map(&:clone)
           set_piece(to_square, moving_piece)
           set_piece(from_square, nil)
           @current_player = @current_player.opponent
