@@ -83,6 +83,7 @@ module Chessington
         possible_moves_lists.push(find_all_diagonal_moves_in_one_direction(current_square, -1, -1))
         possible_moves_lists
       end
+
       def find_all_straight_moves_in_one_direction(current_square, direction)
         current = current_square
         possible_moves = []
@@ -219,7 +220,6 @@ module Chessington
     class Rook
       include Piece
 
-
       def available_moves(board)
         current_square = board.find_piece(self)
         available_moves = []
@@ -262,7 +262,31 @@ module Chessington
       include Piece
 
       def available_moves(board)
-        []
+        current_square = board.find_piece(self)
+        available_moves = []
+        new_position_list = [
+          # Up
+          Square.at(current_square.row + 1, current_square.column),
+          # Up and right
+          Square.at(current_square.row + 1, current_square.column + 1),
+          # Right
+          Square.at(current_square.row, current_square.column + 1),
+          # Down and right
+          Square.at(current_square.row - 1, current_square.column + 1),
+          # Down
+          Square.at(current_square.row - 1, current_square.column),
+          # Down and left
+          Square.at(current_square.row - 1, current_square.column - 1),
+          # Left
+          Square.at(current_square.row, current_square.column - 1),
+          # Up and left
+          Square.at(current_square.row + 1, current_square.column - 1)
+        ]
+        new_position_list.each { |new_position|
+          add_unobstructed_move(board, available_moves, new_position)
+        }
+        add_capture_moves(board, available_moves, new_position_list, self.player)
+        available_moves
       end
     end
   end

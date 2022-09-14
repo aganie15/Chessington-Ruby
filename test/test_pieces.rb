@@ -897,7 +897,104 @@ class TestPieces < Minitest::Test
   class TestKing < Minitest::Test
     include Chessington::Engine
 
+    def test_king_can_move_by_one_square_in_all_directions
+      # Arrange
+      board = Board.empty
+      king = King.new(Player::BLACK)
+      king_square = Square.at(5, 1)
+      board.set_piece(king_square, king)
 
+      # Act
+      moves = king.available_moves(board)
+
+      # Assert
+      # Up
+      assert_includes(moves, Square.at(6, 1))
+      # Up-right
+      assert_includes(moves, Square.at(6, 2))
+      # Right
+      assert_includes(moves, Square.at(5, 2))
+      # Down-right
+      assert_includes(moves, Square.at(4, 2))
+      # Down
+      assert_includes(moves, Square.at(4, 1))
+      # Down-left
+      assert_includes(moves, Square.at(4, 0))
+      # Left
+      assert_includes(moves, Square.at(5, 0))
+      # Up-left
+      assert_includes(moves, Square.at(6, 0))
+
+    end
+
+    def test_king_can_move_by_one_square_in_all_directions
+      # Arrange
+      board = Board.empty
+      king = King.new(Player::BLACK)
+      king_square = Square.at(5, 1)
+      board.set_piece(king_square, king)
+
+      # Act
+      moves = king.available_moves(board)
+
+      # Assert
+      # Up
+      assert_includes(moves, Square.at(6, 1))
+      # Up-right
+      assert_includes(moves, Square.at(6, 2))
+      # Right
+      assert_includes(moves, Square.at(5, 2))
+      # Down-right
+      assert_includes(moves, Square.at(4, 2))
+      # Down
+      assert_includes(moves, Square.at(4, 1))
+      # Down-left
+      assert_includes(moves, Square.at(4, 0))
+      # Left
+      assert_includes(moves, Square.at(5, 0))
+      # Up-left
+      assert_includes(moves, Square.at(6, 0))
+
+    end
+
+    def test_king_can_capture_on_one_square_in_all_directions
+      # Arrange
+      board = Board.empty
+      king = King.new(Player::BLACK)
+      king_square = Square.at(3, 4)
+      board.set_piece(king_square, king)
+
+      enemy = Pawn.new(Player::WHITE)
+      enemy_square = Square.at(4,4)
+      board.set_piece(enemy_square, enemy)
+
+      # Act
+      moves = king.available_moves(board)
+
+      # Assert
+      assert_includes(moves, enemy_square)
+
+    end
+
+    def test_king_cannot_move_if_obstructed
+      # Arrange
+      board = Board.empty
+      king = King.new(Player::BLACK)
+      king_square = Square.at(3, 4)
+      board.set_piece(king_square, king)
+
+      friendly = Pawn.new(Player::BLACK)
+      friendly_square = Square.at(4,4)
+      board.set_piece(friendly_square, friendly)
+
+      # Act
+      moves = king.available_moves(board)
+
+      # Assert
+      refute_includes(moves, friendly_square)
+      refute_includes(moves, Square.at(5,4))
+      refute_includes(moves, Square.at(6,4))
+      refute_includes(moves, Square.at(7,4))
 
     end
 
