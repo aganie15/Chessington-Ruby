@@ -385,7 +385,7 @@ class TestPieces < Minitest::Test
     end
 
     def test_white_pawns_can_capture_en_passant
-
+      # todo: make sure the captured piece is removed!
       # Arrange
       board = Board.empty
       pawn = Pawn.new(Player::WHITE)

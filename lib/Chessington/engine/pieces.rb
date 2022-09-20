@@ -1,6 +1,11 @@
 module Chessington
   module Engine
-    ##
+
+    ## FEEDBACK
+    # use blocks to minimise repeated code (e.g. for example for the code used to implement the bishop, rook + queen)
+    # use pure functions where you can (e.g. get rid of the pushing to available_moves in add_unobstructed_move)
+    # minimise interfaces e.g. get rid of intermediate squares argument
+
     # An abstract base class from which all pieces inherit.
     module Piece
       attr_reader :player
